@@ -187,13 +187,14 @@ class Searcher:
                 if '@' in email and '.' in email and '/' not in email:
                     c.log(f'[bold green]found email {email}')
                     self.email = email
-                    with open(
-                        emails_only,
-                        'r',
-                    ) as file:
-                        if email in file.read():
-                            c.log('already writed')
-                            return
+                    if emails_only.exists():
+                        with open(
+                            emails_only,
+                            'r',
+                        ) as file:
+                            if email in file.read():
+                                c.log('already writed')
+                                return
                     with open(
                         emails_only,
                         'a',
