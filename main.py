@@ -1,3 +1,4 @@
+from sys import exception
 from bs4 import BeautifulSoup as Bs
 from typing import Generator
 from pathlib import Path
@@ -8,14 +9,18 @@ import urllib.parse
 import rich.console
 import datetime
 import requests
-import time
+import sys
 
-
+    
 c = rich.console.Console()
 proj_path = Path(__file__).parent.resolve()
 errors_path = proj_path.joinpath('errors')
 deler_emails = proj_path.joinpath('deler_emails.txt')
 emails_only = proj_path.joinpath('emails_only.txt')
+if sys.argv[-1].isdigit():
+    startfrom = int(sys.argv[-1])
+else:
+    startfrom = 0
 
 
 def pretty(
@@ -85,16 +90,17 @@ class Searcher:
         deler: str,
     ):
         self.deler: str = deler
+        self.deler_spaces = ' '.join(deler.split('_'))
         self.done: set = set()
         self.email: str = ''
 
     def ddg(
         self,
     ) -> None:
-        c.log(f'searching duck duck go for {self.deler}')
+        c.log(f'searching duck duck go for {self.deler_spaces}')
         with duckduckgo_search.DDGS() as ddgs:
             for result in ddgs.text(
-                keywords = self.deler,
+                keywords = self.deler_spaces,
                 region = 'ru-ru',
                 safesearch = 'off',
                 timelimit = '5',
@@ -112,9 +118,9 @@ class Searcher:
     def google(
         self,
     ) -> None:
-        c.log(f'searching google for {self.deler}')
+        c.log(f'searching google for {self.deler_spaces}')
         client = yagooglesearch.SearchClient(
-            query = self.deler,
+            query = self.deler_spaces,
             max_search_result_urls_to_return = 10,
             verbosity = 0,
             verbose_output = False,
@@ -128,16 +134,15 @@ class Searcher:
                     continue
                 self.parse_page(link)
 
-
     def bing(
         self,
     ) -> None:
-        c.log(f'searching bing for {self.deler}')
+        c.log(f'searching bing for {self.deler_spaces}')
         bing = search_engines.Bing(
             timeout = 5
         )
         results = bing.search(
-            self.deler,
+            query = self.deler,
             pages = 1,
         )
         for link in results.links():
@@ -181,7 +186,7 @@ class Searcher:
                 'html.parser',
             )
             for email in soup.text.split():
-                if '@' in email and '.' in email:
+                if '@' in email and '.' in email and '/' not in email:
                     c.log(f'[bold green]found email {email}')
                     self.email = email
                     with open(
@@ -234,21 +239,23 @@ def search_deler_emails(
         return
 
 
-def parse_delers() -> Generator[str, None, None]:
+def main():
     name = 'delerships.txt'
     with open(
         name,
         'r',
     ) as file:
-        for line in file:
-            splitted = line.rsplit('/', 2)
-            yield splitted[-2]
-
-
-def main():
-    for deler in parse_delers():
-        search_deler_emails(deler)
-        time.sleep(1)
+        for index, line in enumerate(file):
+            try:
+                if index >= startfrom:
+                    c.log(f'reading line {index}')
+                    splitted = line.rsplit('/', 2)
+                    deler = splitted[-2]
+                    search_deler_emails(deler)
+            except KeyboardInterrupt as ki:
+                raise ki
+            except Exception:
+                write_error()
 
 
 main()
