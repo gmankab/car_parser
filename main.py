@@ -188,18 +188,25 @@ class Searcher:
                     c.log(f'[bold green]found email {email}')
                     self.email = email
                     with open(
-                        deler_emails,
-                        'a',
+                        emails_only,
+                        'r',
                     ) as file:
-                        file.write(
-                            f'{self.deler} - {self.email}\n',
-                        )
+                        if email in file.read():
+                            c.log('already writed')
+                            return
                     with open(
                         emails_only,
                         'a',
                     ) as file:
                         file.write(
                             self.email + '\n',
+                        )
+                    with open(
+                        deler_emails,
+                        'a',
+                    ) as file:
+                        file.write(
+                            f'{self.deler} - {self.email}\n',
                         )
                     return
         except KeyboardInterrupt as ki:
