@@ -1,10 +1,11 @@
-python -m venv .venv
+python3 -m venv .venv
 . .venv/bin/activate
 
-python -m pip install -U pip
-python -m pip install -U rich duckduckgo_search yagooglesearch
+python3 -m pip install -U pip
+python3 -m pip install -U rich duckduckgo_search yagooglesearch
 
 git clone https://github.com/tasos-py/Search-Engines-Scraper
-python Search-Engines-Scraper/setup.py
+cd Search-Engines-Scraper
+python setup.py install
+cd ..
 rm -rf Search-Engines-Scraper
-
