@@ -1,0 +1,6 @@
+.venv
+*.log
+errors
+emails_only.txt
+deler_emails.txt
+
