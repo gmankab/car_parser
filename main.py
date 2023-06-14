@@ -1,6 +1,4 @@
-from sys import exception
 from bs4 import BeautifulSoup as Bs
-from typing import Generator
 from pathlib import Path
 import duckduckgo_search
 import yagooglesearch
