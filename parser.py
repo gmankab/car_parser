@@ -13,8 +13,11 @@ import sys
 c = rich.console.Console()
 proj_path = Path(__file__).parent.resolve()
 errors_path = proj_path.joinpath('errors')
-deler_emails = proj_path.joinpath('deler_emails.txt')
-emails_only = proj_path.joinpath('emails_only.txt')
+lists_path = proj_path.joinpath('lists')
+deler_emails_path = lists_path.joinpath('deler_emails.txt')
+emails_only_path = lists_path.joinpath('emails_only.txt')
+delerships_path = lists_path.joinpath('delerships.txt')
+
 if sys.argv[-1].isdigit():
     startfrom = int(sys.argv[-1])
 else:
@@ -187,23 +190,23 @@ class Searcher:
                 if '@' in email and '.' in email and '/' not in email:
                     c.log(f'[bold green]found email {email}')
                     self.email = email
-                    if emails_only.exists():
+                    if emails_only_path.exists():
                         with open(
-                            emails_only,
+                            emails_only_path,
                             'r',
                         ) as file:
                             if email in file.read():
                                 c.log('already writed')
                                 return
                     with open(
-                        emails_only,
+                        emails_only_path,
                         'a',
                     ) as file:
                         file.write(
                             self.email + '\n',
                         )
                     with open(
-                        deler_emails,
+                        deler_emails_path,
                         'a',
                     ) as file:
                         file.write(
@@ -236,7 +239,7 @@ def search_deler_emails(
             continue
     if not searcher.email:
         with open(
-            deler_emails,
+            deler_emails_path,
             'a',
         ) as file:
             file.write(
@@ -246,9 +249,8 @@ def search_deler_emails(
 
 
 def main():
-    name = 'delerships.txt'
     with open(
-        name,
+        delerships_path,
         'r',
     ) as file:
         for index, line in enumerate(file):
